@@ -16,6 +16,7 @@ def send_to_google_spreadsheet(payload):
         headers = {'content-type': 'application/json'}
         r = requests.post(config.GOOGLE_APPS_SCRIPT_URL, json=payload, headers=headers)
         print r.content
+        print 'Reported'
     else:
         print 'Not GachiMatch'
 
