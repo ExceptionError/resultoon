@@ -6,20 +6,17 @@ import pyautogui
 
 class Capture(object):
     def __init__(self):
-        self._counter = 0
-        self._base = 0
-        self._f = (1000 / cv2.getTickFrequency())
-        self._start = cv2.getTickCount();
-        self.fps = 30
+        pass
 
-    def tick(self):
-        now = cv2.getTickCount()
-        diff = (now - self._start) * self._f
-        if diff >= 1000:
-           self._start = now
-           self.fps = self._counter - self._base
-           self._base = self._counter
-        self._counter = self._counter + 1
+    @staticmethod
+    def apply(config):
+        W, H = (1280, 720)
+        if config.CAPTURE_DEVICE:
+            return VideoCapture(config.DEVICE_ID, W, H)
+        elif config.SCREEN_W == 0 or config.SCREEN_H == 0:
+            return ScreenCapture(None, 1280, 720)
+        else:
+            return ScreenCapture((config.SCREEN_X, config.SCREEN_Y, config.SCREEN_W, config.SCREEN_H), 1280, 720)
 
 class VideoCapture(Capture):
     def __init__(self, deviceId, width, height):
@@ -32,7 +29,6 @@ class VideoCapture(Capture):
         return self.cap.isOpened()
 
     def read(self):
-        self.tick()
         return self.cap.read()
 
     def release(self):
@@ -50,7 +46,6 @@ class ScreenCapture(Capture):
         return self._is_opened
 
     def read(self):
-        self.tick()
         img = pyautogui.screenshot()
         if self.bbox:
             img = img.crop(self.bbox)
@@ -72,19 +67,7 @@ class FileCapture(Capture):
         return self._is_opened
 
     def read(self):
-        self.tick()
         return (self._is_opened, self.img)
 
     def release(self):
         self._is_opened = False
-
-
-def create(config):
-    if config.CAPTURE_DEVICE:
-        return VideoCapture(config.DEVICE_ID, config.DEVICE_WIDTH, config.DEVICE_HEIGHT)
-    elif config.SCREEN_CROP_W == 0 or config.SCREEN_CROP_H == 0:
-        return ScreenCapture(None, config.SCREEN_WIDTH, config.SCREEN_HEIGHT)
-    else:
-        return ScreenCapture(
-            (config.SCREEN_CROP_X, config.SCREEN_CROP_Y, config.SCREEN_CROP_W, config.SCREEN_CROP_H),
-            config.SCREEN_WIDTH, config.SCREEN_HEIGHT)
