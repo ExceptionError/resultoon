@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import cv2
-import datetime
 import numpy as np
-import requests
 import time
 import tesseract
 
 class GameResult(object):
     def __init__(self, config):
         self.DEBUG = config.DEBUG
-        self.GOOGLE_APPS_SCRIPT_URL = config.GOOGLE_APPS_SCRIPT_URL
 
         self.WIN_RECT = (656, 42, 116, 38)
         self.WIN = cv2.imread('./templates/results/win.png', cv2.IMREAD_GRAYSCALE)
@@ -34,9 +31,7 @@ class GameResult(object):
         self.first_match = 0
         summary = self.summary(img, context.get('gachi', False))
         context['members'] = summary
-        self.send_to_google_spreadsheet(context)
         time.sleep(5)
-        context.clear()
 
     def summary(self, img, is_gachi):
         kills = self.kills(img)
@@ -121,8 +116,3 @@ class GameResult(object):
         ipl_img = cv2.cv.CreateImageHeader((img.shape[1], img.shape[0]), cv2.cv.IPL_DEPTH_8U, 1)
         cv2.cv.SetData(ipl_img, img.tostring())
         return ipl_img
-
-    def send_to_google_spreadsheet(self, payload):
-        headers = {'content-type': 'application/json'}
-        requests.post(self.GOOGLE_APPS_SCRIPT_URL, json=payload, headers=headers)
-        print 'Reported'
