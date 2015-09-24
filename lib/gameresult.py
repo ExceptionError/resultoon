@@ -34,10 +34,9 @@ class GameResult(object):
         self.first_match = 0
         summary = self.summary(img, context.get('gachi', False))
         context['members'] = summary
-        #if context.get('gachi', False):
         self.send_to_google_spreadsheet(context)
         time.sleep(5)
-        context = {}
+        context.clear()
 
     def summary(self, img, is_gachi):
         kills = self.kills(img)
@@ -124,11 +123,6 @@ class GameResult(object):
         return ipl_img
 
     def send_to_google_spreadsheet(self, payload):
-        if payload.get('gachi', False) or True:
-            headers = {'content-type': 'application/json'}
-            print payload
-            r = requests.post(self.GOOGLE_APPS_SCRIPT_URL, json=payload, headers=headers)
-            print r.content
-            print 'Reported'
-        else:
-            print 'Not GachiMatch'
+        headers = {'content-type': 'application/json'}
+        requests.post(self.GOOGLE_APPS_SCRIPT_URL, json=payload, headers=headers)
+        print 'Reported'
