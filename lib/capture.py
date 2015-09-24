@@ -14,9 +14,9 @@ class Capture(object):
         if config.CAPTURE_DEVICE:
             return VideoCapture(config.DEVICE_ID, W, H)
         elif config.SCREEN_W == 0 or config.SCREEN_H == 0:
-            return ScreenCapture(None, 1280, 720)
+            return ScreenCapture(None, W, H)
         else:
-            return ScreenCapture((config.SCREEN_X, config.SCREEN_Y, config.SCREEN_W, config.SCREEN_H), 1280, 720)
+            return ScreenCapture((config.SCREEN_X, config.SCREEN_Y, config.SCREEN_W, config.SCREEN_H), W, H)
 
 class VideoCapture(Capture):
     def __init__(self, deviceId, width, height):

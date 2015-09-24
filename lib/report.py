@@ -5,10 +5,11 @@ import time
 import requests
 
 class Report(object):
+    keys = ['rule', 'stage', 'members']
+
     def __init__(self, config):
         self.DEBUG = config.DEBUG
         self.GOOGLE_APPS_SCRIPT_URL = config.GOOGLE_APPS_SCRIPT_URL
-        self.keys = ['rule', 'stage', 'members']
 
     def match(self, img, context):
         return all([key in context for key in self.keys])

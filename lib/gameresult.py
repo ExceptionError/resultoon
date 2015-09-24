@@ -6,15 +6,14 @@ import time
 import tesseract
 
 class GameResult(object):
+    WIN_RECT = (656, 42, 116, 38)
+    WIN = cv2.imread('./templates/results/win.png', cv2.IMREAD_GRAYSCALE)
+    LOSE_RECT = (656, 374, 116, 38)
+    LOSE = cv2.imread('./templates/results/lose.png', cv2.IMREAD_GRAYSCALE)
+    NUMBERS = [cv2.imread('./templates/numbers/binarized/' + str(x) + '.png', cv2.IMREAD_GRAYSCALE) for x in xrange(10)]
+
     def __init__(self, config):
         self.DEBUG = config.DEBUG
-
-        self.WIN_RECT = (656, 42, 116, 38)
-        self.WIN = cv2.imread('./templates/results/win.png', cv2.IMREAD_GRAYSCALE)
-        self.LOSE_RECT = (656, 374, 116, 38)
-        self.LOSE = cv2.imread('./templates/results/lose.png', cv2.IMREAD_GRAYSCALE)
-        self.NUMBERS = [cv2.imread('./templates/numbers/binarized/' + str(x) + '.png', cv2.IMREAD_GRAYSCALE) for x in xrange(10)]
-
         self.first_match = 0
 
     def match(self, img, context):

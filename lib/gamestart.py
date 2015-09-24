@@ -4,17 +4,15 @@ import cv2
 import time
 
 class GameStart(object):
+    GACHI_LABELS = ['ガチエリア', 'ガチヤグラ', 'ガチホコ']
+    RULE_NAMES = ['nawabari', 'area', 'yagura', 'hoko']
+    RULE_LABELS = ['ナワバリバトル', 'ガチエリア', 'ガチヤグラ', 'ガチホコ']
+    STAGE_NAMES = ['dekaline', 'sionome', 'bbus', 'hakofugu', 'alowana', 'hokke', 'mozuku', 'negitoro', 'tachiuo', 'mongara', 'hirame', 'masaba']
+    STAGE_LABELS = ['デカライン高架下', 'シオノメ油田', 'Bバスパーク', 'ハコフグ倉庫', 'アロワナモール', 'ホッケふ頭', 'モズク農園', 'ネギトロ炭鉱', 'タチウオパーキング', 'モンガラキャンプ場', 'ヒラメが丘団地', 'マサバ海峡大橋']
+
     def __init__(self, config):
         self.DEBUG = config.DEBUG
-
-        self.GACHI_LABELS = ['ガチエリア', 'ガチヤグラ', 'ガチホコ']
-
-        self.RULE_NAMES = ['nawabari', 'area', 'yagura', 'hoko']
-        self.RULE_LABELS = ['ナワバリバトル', 'ガチエリア', 'ガチヤグラ', 'ガチホコ']
         self.RULES = self._load('./templates/rules/', self.RULE_NAMES, '.png')
-
-        self.STAGE_NAMES = ['dekaline', 'sionome', 'bbus', 'hakofugu', 'alowana', 'hokke', 'mozuku', 'negitoro', 'tachiuo', 'mongara', 'hirame', 'masaba']
-        self.STAGE_LABELS = ['デカライン高架下', 'シオノメ油田', 'Bバスパーク', 'ハコフグ倉庫', 'アロワナモール', 'ホッケふ頭', 'モズク農園', 'ネギトロ炭鉱', 'タチウオパーキング', 'モンガラキャンプ場', 'ヒラメが丘団地', 'マサバ海峡大橋']
         self.STAGES = self._load('./templates/stages/', self.STAGE_NAMES, '.png')
 
     def match(self, img, context):
