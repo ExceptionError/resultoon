@@ -32,7 +32,7 @@ class GameStart(object):
         return False
 
     def execute(self, img, context):
-        time.sleep(2)
+        time.sleep(4)
 
     def rule(self, img):
         return self._match(img, (489, 250, 300, 60), self.RULES)
