@@ -60,15 +60,10 @@ Version 3.0のOpenCV For Windowsのリンクからインストーラをダウン
 | CAPTURE_DEVICE         | デバイスを使用するか(しない場合はデスクトップキャプチャ)    | `false` |
 | GOOGLE_APPS_SCRIPT_URL | Google Spreadsheetに送信する場合の送信先URL     |  ` `  |
 | CAPTURE_DEVICE_ID      | HDMIキャプチャボードのデバイスID                    |  `0`  |
-| WIDTH                  | キャプチャの横幅                                | `1280` |
-| HEIGHT                 | キャプチャの縦幅                                | `720`  |
 | CROP_X                 | デスクトップキャプチャのX座標                        |  `0`   |
 | CROP_Y                 | デスクトップキャプチャのY座標                        |  `0`   |
 | CROP_W                 | デスクトップキャプチャの横幅(0でクロップせずフルスクリーン)    |  `0`   |
 | CROP_H                 | デスクトップキャプチャの縦幅(0でクロップせずフルスクリーン)    |  `0`   |
-| WIDTH                  | デスクトップキャプチャの横幅                         | `1280` |
-| HEIGHT                 | デスクトップキャプチャの縦幅                         | `720`  |
-| DISPLAY                | プレビューウィンドウを表示するかどうか                   | `true` |
 
 
 ## 利用方法
@@ -79,8 +74,7 @@ Version 3.0のOpenCV For Windowsのリンクからインストーラをダウン
 
 
 ### 終了
-コマンドプロンプトで `q` と入力してください。
-プレビューウィンドウで `Esc` キーを押すとウィンドウを閉じますが処理は継続しています。
+プレビューウィンドウで `Esc` キーを押すとウィンドウを閉じます。
 
 ### 注意
 - PC上のウィンドウにもゲーム画面が表示されますが、**fpsは一定ではありません**。PCの処理内容によってはプレイに支障をきたすレベルでfpsが低下するおそれがあります。そのため、分配器を使った別モニタへの表示を強く推奨します。
@@ -113,20 +107,20 @@ Google Spreadsheet上にリザルトを記録するためには、以下の設�
 
 ```
 {
-    udemae_point: 19,
-    udemae_diff: "+3",
     members: [
         {
             team: "win",
             udemae: "A+",
             kill: 6,
-            death: 3
+            death: 3,
+            isPlayer: false
         },
         {
             team: "win",
             udemae: "S",
             kill: 3,
-            death: 1
+            death: 1,
+            isPlayer: false
         },
         {
             team: "win",
@@ -139,31 +133,36 @@ Google Spreadsheet上にリザルトを記録するためには、以下の設�
             team: "win",
             udemae: "A",
             kill: 1,
-            death: 0
+            death: 0,
+            isPlayer: false
         },
         {
             team: "lose",
             udemae: "A+",
             kill: 2,
-            death: 3
+            death: 3,
+            isPlayer: false
         },
         {
             team: "lose",
             udemae: "A",
             kill: 1,
-            death: 3
+            death: 3,
+            isPlayer: false
         },
         {
             team: "lose",
             udemae: "A",
             kill: 0,
-            death: 2
+            death: 2,
+            isPlayer: false
         },
         {
             team: "lose",
             udemae: "S",
             kill: 0,
-            death: 4
+            death: 4,
+            isPlayer: false
         }
     ],
     rule: "ガチヤグラ",
@@ -172,13 +171,15 @@ Google Spreadsheet上にリザルトを記録するためには、以下の設�
 ```
 
 ## TODO
-- リザルトをCSV形式で保存する機能の追加
-- エラー例外処理
-- ポイントの算出が不安定なのでOCRをやめて機械学習に変更
+- ローカルにCSVで保存する機能の追加
+- 不安定なので削除したウデマエポイントの算出の復活
+- チョーシの管理と記録
+- 敵味方のキルデスの保存
 
 ## License
 MIT
 
 ## Author
 Copyright(c) 2015- Kenichi Koyama
+
 Copyright(c) 2015- ExceptionError
