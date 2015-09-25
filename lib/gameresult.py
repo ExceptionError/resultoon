@@ -5,12 +5,16 @@ import numpy as np
 import time
 import tesseract
 
+
 class GameResult(object):
     WIN_RECT = (656, 42, 116, 38)
     WIN = cv2.imread('./templates/results/win.png', cv2.IMREAD_GRAYSCALE)
     LOSE_RECT = (656, 374, 116, 38)
     LOSE = cv2.imread('./templates/results/lose.png', cv2.IMREAD_GRAYSCALE)
-    NUMBERS = [cv2.imread('./templates/numbers/binarized/' + str(x) + '.png', cv2.IMREAD_GRAYSCALE) for x in xrange(10)]
+    NUMBERS = [cv2.imread(
+        './templates/numbers/binarized/' + str(x) + '.png',
+        cv2.IMREAD_GRAYSCALE
+    ) for x in xrange(10)]
 
     def __init__(self, config):
         self.DEBUG = config.DEBUG
@@ -38,9 +42,11 @@ class GameResult(object):
         udemaes = self.udemaes(img, is_gachi)
         players = self.players(img)
         members = []
-        for i, udemae, kill, death, player in zip(xrange(8), udemaes, kills, deaths, players):
+        zipped = zip(xrange(8), udemaes, kills, deaths, players)
+        for i, udemae, kill, death, player in zipped:
             team = 'win' if i < 4 else 'lose'
-            member = {'udemae': udemae, 'kill': kill, 'death': death, 'isPlayer': player, 'team': team}
+            member = {'udemae': udemae, 'kill': kill,
+                      'death': death, 'isPlayer': player, 'team': team}
             members.append(member)
         return members
 
@@ -52,14 +58,15 @@ class GameResult(object):
 
     def players(self, img):
         X, Y, W, H = (616, [102, 167, 232, 297, 432, 497, 562, 627], 36, 36)
-        imgs = [img[y:y+H, X:X+W] for y in Y]
+        imgs = [img[y:y + H, X:X + W] for y in Y]
         white_areas = [self._white_area(img) for img in imgs]
         return [bool(area == max(white_areas)) for area in white_areas]
 
     def udemaes(self, img, is_gachi):
         if is_gachi:
-            X, Y, W, H = (1027, [102, 167, 232, 297, 432, 497, 562, 627], 53, 36)
-            imgs = [img[y:y+H, X:X+W] for y in Y]
+            X, Y, W, H = (
+                1027, [102, 167, 232, 297, 432, 497, 562, 627], 53, 36)
+            imgs = [img[y:y + H, X:X + W] for y in Y]
             return [self._udemae(img) for img in imgs]
         else:
             return ['' for x in xrange(8)]
@@ -73,7 +80,11 @@ class GameResult(object):
 
     def _kds(self, img, Y):
         X0, X1, W, H, = (1187, 1202, 12, 18)
-        return [10 * self._digit(img[y:y+H, X0:X0+W]) + self._digit(img[y:y+H, X1:X1+W]) for y in Y]
+        return [
+            10 * self._digit(img[y:y + H, X0:X0 + W]) +
+            1 * self._digit(img[y:y + H, X1:X1 + W])
+            for y in Y
+        ]
 
     def _digit(self, img):
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -92,7 +103,8 @@ class GameResult(object):
         img = self._erode(self._binarize(img))
 
         api = tesseract.TessBaseAPI()
-        api.Init("C:\Program Files (x86)\Tesseract-OCR", "eng", tesseract.OEM_DEFAULT)
+        api.Init("C:\Program Files (x86)\Tesseract-OCR",
+                 "eng", tesseract.OEM_DEFAULT)
         api.SetVariable("tessedit_char_whitelist", "SABC+-")
         api.SetPageSegMode(tesseract.PSM_SINGLE_LINE)
 
@@ -104,7 +116,8 @@ class GameResult(object):
     def _binarize(self, img):
         if img.shape[2] != 1:
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        ret, bin = cv2.threshold(img, 240, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+        ret, bin = cv2.threshold(
+            img, 240, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
         return bin
 
     def _erode(self, img):
@@ -112,6 +125,7 @@ class GameResult(object):
         return cv2.erode(img, kernel, iterations=1)
 
     def _ipl_image(self, img):
-        ipl_img = cv2.cv.CreateImageHeader((img.shape[1], img.shape[0]), cv2.cv.IPL_DEPTH_8U, 1)
+        ipl_img = cv2.cv.CreateImageHeader(
+            (img.shape[1], img.shape[0]), cv2.cv.IPL_DEPTH_8U, 1)
         cv2.cv.SetData(ipl_img, img.tostring())
         return ipl_img

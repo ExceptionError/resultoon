@@ -4,7 +4,9 @@ import cv2
 import numpy as np
 import pyautogui
 
+
 class Capture(object):
+
     def __init__(self):
         pass
 
@@ -13,12 +15,14 @@ class Capture(object):
         W, H = (1280, 720)
         if config.CAPTURE_DEVICE:
             return VideoCapture(config.DEVICE_ID, W, H)
-        elif config.SCREEN_W == 0 or config.SCREEN_H == 0:
+        elif config.SCREEN_RECT_DISABLED:
             return ScreenCapture(None, W, H)
         else:
-            return ScreenCapture((config.SCREEN_X, config.SCREEN_Y, config.SCREEN_W, config.SCREEN_H), W, H)
+            return ScreenCapture(config.SCREEN_RECT, W, H)
+
 
 class VideoCapture(Capture):
+
     def __init__(self, deviceId, width, height):
         super(VideoCapture, self).__init__()
         self.cap = cv2.VideoCapture(deviceId)
@@ -34,7 +38,9 @@ class VideoCapture(Capture):
     def release(self):
         self.cap.release()
 
+
 class ScreenCapture(Capture):
+
     def __init__(self, bbox, width, height):
         super(ScreenCapture, self).__init__()
         self.bbox = bbox
@@ -57,7 +63,9 @@ class ScreenCapture(Capture):
     def release(self):
         self._is_opened = False
 
+
 class FileCapture(Capture):
+
     def __init__(self, file):
         super(FileCapture, self).__init__()
         self.img = cv2.imread(file)

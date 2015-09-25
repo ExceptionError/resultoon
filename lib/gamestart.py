@@ -3,17 +3,27 @@
 import cv2
 import time
 
+
 class GameStart(object):
     GACHI_LABELS = ['ガチエリア', 'ガチヤグラ', 'ガチホコ']
     RULE_NAMES = ['nawabari', 'area', 'yagura', 'hoko']
     RULE_LABELS = ['ナワバリバトル', 'ガチエリア', 'ガチヤグラ', 'ガチホコ']
-    STAGE_NAMES = ['dekaline', 'sionome', 'bbus', 'hakofugu', 'alowana', 'hokke', 'mozuku', 'negitoro', 'tachiuo', 'mongara', 'hirame', 'masaba']
-    STAGE_LABELS = ['デカライン高架下', 'シオノメ油田', 'Bバスパーク', 'ハコフグ倉庫', 'アロワナモール', 'ホッケふ頭', 'モズク農園', 'ネギトロ炭鉱', 'タチウオパーキング', 'モンガラキャンプ場', 'ヒラメが丘団地', 'マサバ海峡大橋']
+    STAGE_NAMES = [
+        'dekaline', 'sionome', 'bbus', 'hakofugu', 'alowana',
+        'hokke', 'mozuku', 'negitoro', 'tachiuo', 'mongara',
+        'hirame', 'masaba'
+    ]
+    STAGE_LABELS = [
+        'デカライン高架下', 'シオノメ油田', 'Bバスパーク', 'ハコフグ倉庫', 'アロワナモール',
+        'ホッケふ頭', 'モズク農園', 'ネギトロ炭鉱', 'タチウオパーキング', 'モンガラキャンプ場',
+        'ヒラメが丘団地', 'マサバ海峡大橋'
+    ]
 
     def __init__(self, config):
         self.DEBUG = config.DEBUG
         self.RULES = self._load('./templates/rules/', self.RULE_NAMES, '.png')
-        self.STAGES = self._load('./templates/stages/', self.STAGE_NAMES, '.png')
+        self.STAGES = self._load(
+            './templates/stages/', self.STAGE_NAMES, '.png')
 
     def match(self, img, context):
         rule = self.rule(img)
@@ -42,7 +52,10 @@ class GameStart(object):
         return context.get('rule') in self.GACHI_LABELS
 
     def _load(self, prefix, names, postfix):
-        return [cv2.imread(prefix + name + postfix, cv2.IMREAD_GRAYSCALE) for name in names]
+        return [cv2.imread(
+            prefix + name + postfix,
+            cv2.IMREAD_GRAYSCALE
+        ) for name in names]
 
     def _match(self, img, rect, templates):
         X, Y, W, H = rect

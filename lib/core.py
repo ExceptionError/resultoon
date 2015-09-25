@@ -6,6 +6,7 @@ from gamestart import *
 from gameresult import *
 from report import *
 
+
 class Core(object):
     config = Config()
     capture = Capture.apply(config)

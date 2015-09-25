@@ -2,6 +2,7 @@
 
 import requests
 
+
 class Report(object):
     keys = ['rule', 'stage', 'members']
 
@@ -21,4 +22,5 @@ class Report(object):
 
     def send_to_google_spreadsheet(self, payload):
         headers = {'content-type': 'application/json'}
-        requests.post(self.GOOGLE_APPS_SCRIPT_URL, json=payload, headers=headers)
+        requests.post(
+            self.GOOGLE_APPS_SCRIPT_URL, json=payload, headers=headers)
