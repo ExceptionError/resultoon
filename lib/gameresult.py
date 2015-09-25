@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 import time
 import tesseract
+import utils
 
 
 class GameResult(object):
@@ -21,8 +22,8 @@ class GameResult(object):
         self.first_match = 0
 
     def match(self, img, context):
-        win = self._match(img, self.WIN_RECT, self.WIN)
-        lose = self._match(img, self.LOSE_RECT, self.LOSE)
+        win = utils.match_binary(img, self.WIN_RECT, 250, 255, self.WIN)
+        lose = utils.match_binary(img, self.LOSE_RECT, 250, 255, self.LOSE)
         if win and lose and self.first_match == 0:
             self.first_match = time.time()
             return True
@@ -71,13 +72,6 @@ class GameResult(object):
         else:
             return ['' for x in xrange(8)]
 
-    def _match(self, img, rect, base):
-        X, Y, W, H = rect
-        gray = cv2.cvtColor(img[Y:Y + H, X:X + W], cv2.COLOR_BGR2GRAY)
-        ret, bin = cv2.threshold(gray, 250, 255, cv2.THRESH_BINARY)
-        coef = cv2.matchTemplate(bin, base, cv2.TM_CCOEFF_NORMED)
-        return coef[0] > 0.95
-
     def _kds(self, img, Y):
         X0, X1, W, H, = (1187, 1202, 12, 18)
         return [
@@ -87,20 +81,18 @@ class GameResult(object):
         ]
 
     def _digit(self, img):
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        ret, bin = cv2.threshold(gray, 240, 255, cv2.THRESH_BINARY)
+        bin = utils.binary(img, None, 240, 255)
         if bin.sum() < 10:
             return 0
         dist = [(bin - number).sum() for number in self.NUMBERS]
         return dist.index(min(dist))
 
     def _white_area(self, img):
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        ret, binary_img = cv2.threshold(gray, 240, 255, cv2.THRESH_BINARY)
-        return binary_img.sum()
+        bin = utils.binary(img, None, 240, 255)
+        return bin.sum()
 
     def _udemae(self, img):
-        img = self._erode(self._binarize(img))
+        img = self._erode(utils.binary(img, None, 240, 255))
 
         api = tesseract.TessBaseAPI()
         api.Init("C:\Program Files (x86)\Tesseract-OCR",
@@ -112,13 +104,6 @@ class GameResult(object):
         tesseract.SetCvImage(ipl_img, api)
         udemae = api.GetUTF8Text().split("\n")[0]
         return udemae
-
-    def _binarize(self, img):
-        if img.shape[2] != 1:
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        ret, bin = cv2.threshold(
-            img, 240, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-        return bin
 
     def _erode(self, img):
         kernel = np.ones((4, 4), np.uint8)

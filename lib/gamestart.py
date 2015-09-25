@@ -2,6 +2,7 @@
 
 import cv2
 import time
+import utils
 
 
 class GameStart(object):
@@ -21,9 +22,8 @@ class GameStart(object):
 
     def __init__(self, config):
         self.DEBUG = config.DEBUG
-        self.RULES = self._load('./templates/rules/', self.RULE_NAMES, '.png')
-        self.STAGES = self._load(
-            './templates/stages/', self.STAGE_NAMES, '.png')
+        self.RULES = self._load('rules/', self.RULE_NAMES, '.png')
+        self.STAGES = self._load('stages/', self.STAGE_NAMES, '.png')
 
     def match(self, img, context):
         rule = self.rule(img)
@@ -53,15 +53,13 @@ class GameStart(object):
 
     def _load(self, prefix, names, postfix):
         return [cv2.imread(
-            prefix + name + postfix,
+            './templates/' + prefix + name + postfix,
             cv2.IMREAD_GRAYSCALE
         ) for name in names]
 
     def _match(self, img, rect, templates):
-        X, Y, W, H = rect
-        D = 255 * W * H
-        gray = cv2.cvtColor(img[Y:Y + H, X:X + W], cv2.COLOR_BGR2GRAY)
-        ret, bin = cv2.threshold(gray, 240, 255, cv2.THRESH_BINARY)
+        D = 255 * rect[2] * rect[3]
+        bin = utils.binary(img, rect, 240, 255)
         norm = [cv2.norm(bin, tpl, cv2.NORM_L1) / D for tpl in templates]
         score = min(norm)
         if score > 0.05:
