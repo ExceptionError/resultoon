@@ -3,19 +3,25 @@
 import cv2
 
 
-def binary(img, rect, thresh, maxval):
+def crop(img, rect):
     if rect is not None:
         X, Y, W, H = rect
-        crop = img[Y:Y + H, X:X + W]
+        return img[Y:Y + H, X:X + W]
     else:
-        crop = img
+        return img
 
-    if crop.shape[2] != 1:
-        gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
+
+def gray(img):
+    if img.shape[2] != 1:
+        return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     else:
-        gray = crop
+        return img
 
-    ret, bin = cv2.threshold(gray, thresh, maxval, cv2.THRESH_BINARY)
+
+def binary(img, rect, thresh, maxval):
+    c = crop(img, rect)
+    g = gray(c)
+    ret, bin = cv2.threshold(g, thresh, maxval, cv2.THRESH_BINARY)
     return bin
 
 

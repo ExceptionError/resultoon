@@ -2,12 +2,14 @@
 
 import cv2
 import numpy as np
-import time
 import tesseract
 import utils
 
 
 class GameResult(object):
+    wait_time = 1
+    interval_time = 5
+
     WIN_RECT = (656, 42, 116, 38)
     WIN = cv2.imread('./templates/results/win.png', cv2.IMREAD_GRAYSCALE)
     LOSE_RECT = (656, 374, 116, 38)
@@ -19,29 +21,21 @@ class GameResult(object):
 
     def __init__(self, config):
         self.DEBUG = config.DEBUG
-        self.first_match = 0
 
     def match(self, img, context):
         win = utils.match_binary(img, self.WIN_RECT, 250, 255, self.WIN)
         lose = utils.match_binary(img, self.LOSE_RECT, 250, 255, self.LOSE)
-        if win and lose and self.first_match == 0:
-            self.first_match = time.time()
-            return True
-
-    def wait(self):
-        return time.time() - self.first_match < 1
+        return win and lose
 
     def execute(self, img, context):
         self.first_match = 0
-        summary = self.summary(img, context.get('gachi', False))
-        context['members'] = summary
-        time.sleep(5)
+        context['members'] = self._members(img, context.get('gachi', False))
 
-    def summary(self, img, is_gachi):
-        kills = self.kills(img)
-        deaths = self.deaths(img)
-        udemaes = self.udemaes(img, is_gachi)
-        players = self.players(img)
+    def _members(self, img, is_gachi):
+        kills = self._kills(img)
+        deaths = self._deaths(img)
+        udemaes = self._udemaes(img, is_gachi)
+        players = self._players(img)
         members = []
         zipped = zip(xrange(8), udemaes, kills, deaths, players)
         for i, udemae, kill, death, player in zipped:
@@ -51,22 +45,23 @@ class GameResult(object):
             members.append(member)
         return members
 
-    def kills(self, img):
+    def _kills(self, img):
         return self._kds(img, [102, 167, 232, 297, 432, 497, 562, 627])
 
-    def deaths(self, img):
+    def _deaths(self, img):
         return self._kds(img, [123, 188, 253, 318, 453, 518, 583, 648])
 
-    def players(self, img):
-        X, Y, W, H = (616, [102, 167, 232, 297, 432, 497, 562, 627], 36, 36)
+    def _players(self, img):
+        X, W, H = (616, 36, 36)
+        Y = [102, 167, 232, 297, 432, 497, 562, 627]
         imgs = [img[y:y + H, X:X + W] for y in Y]
         white_areas = [self._white_area(img) for img in imgs]
         return [bool(area == max(white_areas)) for area in white_areas]
 
-    def udemaes(self, img, is_gachi):
+    def _udemaes(self, img, is_gachi):
         if is_gachi:
-            X, Y, W, H = (
-                1027, [102, 167, 232, 297, 432, 497, 562, 627], 53, 36)
+            X, W, H = (1027, 53, 36)
+            Y = [102, 167, 232, 297, 432, 497, 562, 627]
             imgs = [img[y:y + H, X:X + W] for y in Y]
             return [self._udemae(img) for img in imgs]
         else:
@@ -92,7 +87,9 @@ class GameResult(object):
         return bin.sum()
 
     def _udemae(self, img):
-        img = self._erode(utils.binary(img, None, 240, 255))
+        type = cv2.THRESH_BINARY | cv2.THRESH_OTSU
+        ret, bin = cv2.threshold(utils.gray(img), 240, 255, type)
+        img = self._erode(bin)
 
         api = tesseract.TessBaseAPI()
         api.Init("C:\Program Files (x86)\Tesseract-OCR",

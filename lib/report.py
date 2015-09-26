@@ -13,14 +13,11 @@ class Report(object):
     def match(self, img, context):
         return all([key in context for key in self.keys])
 
-    def wait(self):
-        return False
-
     def execute(self, img, context):
-        self.send_to_google_spreadsheet(context)
+        self._send_to_google_spreadsheet(context)
         map(context.pop, self.keys)
 
-    def send_to_google_spreadsheet(self, payload):
+    def _send_to_google_spreadsheet(self, payload):
         headers = {'content-type': 'application/json'}
         requests.post(
             self.GOOGLE_APPS_SCRIPT_URL, json=payload, headers=headers)

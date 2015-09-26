@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import cv2
-import time
 import utils
 
 
 class GameStart(object):
+    interval_time = 4
+
     GACHI_LABELS = ['ガチエリア', 'ガチヤグラ', 'ガチホコ']
     RULE_NAMES = ['nawabari', 'area', 'yagura', 'hoko']
     RULE_LABELS = ['ナワバリバトル', 'ガチエリア', 'ガチヤグラ', 'ガチホコ']
@@ -26,29 +27,25 @@ class GameStart(object):
         self.STAGES = self._load('stages/', self.STAGE_NAMES, '.png')
 
     def match(self, img, context):
-        rule = self.rule(img)
-        if rule is not None:
-            context['rule'] = self.RULE_LABELS[rule]
-            context['gachi'] = self.is_gachi(context)
-
-        stage = self.stage(img)
-        if stage is not None:
-            context['stage'] = self.STAGE_LABELS[stage]
-        return rule and stage
-
-    def wait(self):
-        return False
+        return self._rule(img) and self._stage(img)
 
     def execute(self, img, context):
-        time.sleep(4)
+        rule = self._rule(img)
+        if rule is not None:
+            context['rule'] = self.RULE_LABELS[rule]
+            context['gachi'] = self._is_gachi(context)
 
-    def rule(self, img):
+        stage = self._stage(img)
+        if stage is not None:
+            context['stage'] = self.STAGE_LABELS[stage]
+
+    def _rule(self, img):
         return self._match(img, (489, 250, 300, 60), self.RULES)
 
-    def stage(self, img):
+    def _stage(self, img):
         return self._match(img, (811, 582, 420, 60), self.STAGES)
 
-    def is_gachi(self, context):
+    def _is_gachi(self, context):
         return context.get('rule') in self.GACHI_LABELS
 
     def _load(self, prefix, names, postfix):
