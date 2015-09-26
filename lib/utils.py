@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import cv2
+import tesseract
 
 
 def crop(img, rect):
@@ -32,3 +33,29 @@ def match(img, tpl):
 
 def match_binary(img, rect, thresh, maxval, tpl):
     return match(binary(img, rect, thresh, maxval), tpl)
+
+
+def ipl_image(img):
+    ipl = cv2.cv.CreateImageHeader(
+        (img.shape[1], img.shape[0]),
+        cv2.cv.IPL_DEPTH_8U,
+        1
+    )
+    cv2.cv.SetData(ipl, img.tostring())
+    return ipl
+
+
+def tesseract_text(ipl_img, chars):
+    path = "C:\Program Files (x86)\Tesseract-OCR"
+    api = tesseract.TessBaseAPI()
+    api.Init(path, "eng", tesseract.OEM_DEFAULT)
+    api.SetVariable("tessedit_char_whitelist", chars)
+    api.SetPageSegMode(tesseract.PSM_SINGLE_LINE)
+    tesseract.SetCvImage(ipl_img, api)
+    return api.GetUTF8Text().split("\n")[0]
+
+
+def text(img, chars):
+    ipl_img = ipl_image(img)
+    text = tesseract_text(ipl_img, chars)
+    return text

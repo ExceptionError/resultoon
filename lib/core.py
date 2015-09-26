@@ -6,6 +6,7 @@ from capture import *
 from gamestart import *
 from gameresult import *
 from report import *
+from tyoshi import *
 
 
 class Core(object):
@@ -14,6 +15,7 @@ class Core(object):
     match_time = {}
     context = {}
     steps = [
+        Tyoshi(config),
         GameStart(config),
         GameResult(config),
         Report(config)

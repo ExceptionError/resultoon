@@ -2,7 +2,6 @@
 
 import cv2
 import numpy as np
-import tesseract
 import utils
 
 
@@ -90,24 +89,8 @@ class GameResult(object):
         type = cv2.THRESH_BINARY | cv2.THRESH_OTSU
         ret, bin = cv2.threshold(utils.gray(img), 240, 255, type)
         img = self._erode(bin)
-
-        api = tesseract.TessBaseAPI()
-        api.Init("C:\Program Files (x86)\Tesseract-OCR",
-                 "eng", tesseract.OEM_DEFAULT)
-        api.SetVariable("tessedit_char_whitelist", "SABC+-")
-        api.SetPageSegMode(tesseract.PSM_SINGLE_LINE)
-
-        ipl_img = self._ipl_image(img)
-        tesseract.SetCvImage(ipl_img, api)
-        udemae = api.GetUTF8Text().split("\n")[0]
-        return udemae
+        return utils.text(img, "SABC+-")
 
     def _erode(self, img):
         kernel = np.ones((4, 4), np.uint8)
         return cv2.erode(img, kernel, iterations=1)
-
-    def _ipl_image(self, img):
-        ipl_img = cv2.cv.CreateImageHeader(
-            (img.shape[1], img.shape[0]), cv2.cv.IPL_DEPTH_8U, 1)
-        cv2.cv.SetData(ipl_img, img.tostring())
-        return ipl_img
